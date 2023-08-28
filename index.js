@@ -89,16 +89,16 @@ Aşağıdaki macSonucu() fonksiyonununda aşağıdakileri yapınız:
 }
 */ 
 
-function macSonucu(cbFunc,period){
-  const match = {
+function macSonucu(cbfTakimSkoru,period){
+  const resultMatch = {
     EvSahibi : 0,
     KonukTakim : 0
   }
   for(let i = 0; i < period; i++){
-    match.EvSahibi += cbFunc();
-    match.KonukTakim += cbFunc();
+    resultMatch.EvSahibi += cbfTakimSkoru();
+    resultMatch.KonukTakim += cbfTakimSkoru();
   }
-  return match;
+  return resultMatch;
 }
 
 /* Zorlayıcı Görev 4: periyotSkoru()
@@ -115,14 +115,14 @@ Aşağıdaki periyotSkoru() fonksiyonununda aşağıdakileri yapınız:
   */
 
 
-function periyotSkoru(callBackFunc) {
-  const scorePerPeriod = {
+function periyotSkoru(cbfTakimSkoru) {
+  const scorePeriod = {
     EvSahibi : 0,
     KonukTakim : 0
   }
-  scorePerPeriod.EvSahibi += callBackFunc();
-  scorePerPeriod.KonukTakim += callBackFunc(); 
-  return scorePerPeriod
+  scorePeriod.EvSahibi += cbfTakimSkoru();
+  scorePeriod.KonukTakim += cbfTakimSkoru(); 
+  return scorePeriod
 }
 
 
@@ -158,19 +158,27 @@ MAÇ UZAR ise skorTabelasi(periyotSkoru,takimSkoru,4)
 // NOTE: Bununla ilgili bir test yoktur. Eğer logladığınız sonuçlar yukarıdakine benziyor ise tmamlandı sayabilirsiniz.
 
 function skorTabelasi(cbfPeriyotSkoru,cbfTakimSkoru,period) {
+  // toplam skorun tutulduğu değişkenler
   let homeScore = 0;
   let awayScore = 0;
+  // periyot başı durum dizisi
   const scorePeriod = [];
+  // parametreden gelen periyot kadar maç döngüsü yaratır
   for(let i = 0; i < period; i++){
+    // fonksiyon ile EvSahibi ve Misafir Takım için rastgele sayı atanır 
     let homeScorePeriod = cbfPeriyotSkoru(cbfTakimSkoru).EvSahibi;
     let awayScorePeriod = cbfPeriyotSkoru(cbfTakimSkoru).KonukTakim;
+    // atanan sayılar ana değişkenlerde toplanır
     homeScore += homeScorePeriod;
     awayScore += awayScorePeriod;
+    // her periyot sonucu string değişkene atanır
     let scorePeriodSTR = `${i+1}. Periyot: Ev Sahibi ${homeScorePeriod} - Konuk Takım ${awayScorePeriod}`;
+    // string ifade diziye push edilir bu sayede liste halinde geri çağırmak mümkündür
     scorePeriod.push(scorePeriodSTR); 
   }
-  let periodNum = 0;
-  while(homeScore === awayScore){
+  // normal periyotlar bittiği halde eşitlik bozulmadıysa, eşitlik bozulana kadar oyun devam eder
+  let periodNum = 0; // periyot sayısını almak için kullanılır
+  while(homeScore === awayScore){ // eşitlik olduğu sürece işlemler tekrarlanır
     periodNum++;
     let homeScorePeriod = cbfPeriyotSkoru(cbfTakimSkoru).EvSahibi;
     let awayScorePeriod = cbfPeriyotSkoru(cbfTakimSkoru).KonukTakim;
@@ -179,9 +187,11 @@ function skorTabelasi(cbfPeriyotSkoru,cbfTakimSkoru,period) {
     let scorePeriodSTR = `${periodNum}. UZATMA Periyot: Ev Sahibi ${homeScorePeriod} - Konuk Takım ${awayScorePeriod}`;
     scorePeriod.push(scorePeriodSTR); 
   }
+  // eşitlik bozuldu, bir kazanan var tüm periyotlar ekrana dökülür
   for(let period of scorePeriod){
     console.log(period)
   }
+  // maç sonucu ekrana verir
   return `Maç Sonucu: Ev Sahibi ${homeScore} - Konuk Takım ${awayScore}`;
 }
 
