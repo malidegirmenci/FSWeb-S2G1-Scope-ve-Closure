@@ -30,10 +30,16 @@ console.log('örnek görev:', ilkiniDon(['as','sa'],function(metin){return metin
   Aşağıdaki skor1 ve skor2 kodlarını inceleyiniz ve aşağıdaki soruları altına not alarak cevaplayın
   
   1. skor1 ve skor2 arasındaki fark nedir?
+  C1 - skor1 her bir örneğin kendi bağımsız "skor" değerini tutan bir yapıdayken, skor2 globaldeki skor değişkenini kullanır. 
   
   2. Hangisi bir closure kullanmaktadır? Nasıl tarif edebilirsin? (yarınki derste öğreneceksin :) )
-  
+  C2 - skor1 de closure kullanılmaktadır. Closure basit ifadeyle performans ve güvenlik sebebiyle 
+       fonksiyon içerisinde fonksiyon oluşturulması ve içteki fonksiyonun dıştaki fonksiyonun kapsamında olmasından dolayı gerekli değişkenlerine erişiminin olmasıdır.
+ 
   3. Hangi durumda skor1 tercih edilebilir? Hangi durumda skor2 daha mantıklıdır?
+  C3 - Örneğin değişkenin tüm fonksiyonlar ya da tüm index içerisinden ulaşılması isteniyorsa skor2 kullanılmalıdır.
+     Fakat bu karmaşıklığa ve hataya yol açabileceğinden higher-order function ve closure yapısıyla bu sadece o fonksiyon çağrıldığında çalışacak başka bir fonksiyonun içerisinde yer aldığında o değişkenin güvenliğini arttırmış oluruz.
+     Ayrıca performans açısından globalde sürekli yer kaplayan değişken yerine ihtiyaç halinde fonksiyon çalıştığında ram'de yer kaplar. Bunun da performansı etkileyeceğini düşünüyorum.
 */
 
 // skor1 kodları
@@ -52,7 +58,7 @@ let skor = 0;
 function skor2() {
   return skor++;
 }
-
+// 
 
 /* Görev 2: takimSkoru() 
 Aşağıdaki takimSkoru() fonksiyonununda aşağıdakileri yapınız:
@@ -64,12 +70,9 @@ Aşağıdaki takimSkoru() fonksiyonununda aşağıdakileri yapınız:
 Not: Bu fonskiyon, aşağıdaki diğer görevler için de bir callback fonksiyonu olarak da kullanılacak
 */
 
-function takimSkoru(/*Kodunuzu buraya yazınız*/){
-    /*Kodunuzu buraya yazınız*/
+function takimSkoru(){
+  return Math.floor(Math.random()*16) + 10
 }
-
-
-
 
 /* Görev 3: macSonucu() 
 Aşağıdaki macSonucu() fonksiyonununda aşağıdakileri yapınız:
@@ -86,14 +89,17 @@ Aşağıdaki macSonucu() fonksiyonununda aşağıdakileri yapınız:
 }
 */ 
 
-function macSonucu(/*Kodunuzu buraya yazınız*/){
-  /*Kodunuzu buraya yazınız*/
+function macSonucu(cbFunc,period){
+  const match = {
+    EvSahibi : 0,
+    KonukTakim : 0
+  }
+  for(let i = 0; i < period; i++){
+    match.EvSahibi += cbFunc();
+    match.KonukTakim += cbFunc();
+  }
+  return match;
 }
-
-
-
-
-
 
 /* Zorlayıcı Görev 4: periyotSkoru()
 Aşağıdaki periyotSkoru() fonksiyonununda aşağıdakileri yapınız:
@@ -109,9 +115,14 @@ Aşağıdaki periyotSkoru() fonksiyonununda aşağıdakileri yapınız:
   */
 
 
-function periyotSkoru(/*Kodunuzu buraya yazınız*/) {
-  /*Kodunuzu buraya yazınız*/
-
+function periyotSkoru(callBackFunc) {
+  const scorePerPeriod = {
+    EvSahibi : 0,
+    KonukTakim : 0
+  }
+  scorePerPeriod.EvSahibi += callBackFunc();
+  scorePerPeriod.KonukTakim += callBackFunc(); 
+  return scorePerPeriod
 }
 
 
@@ -146,10 +157,33 @@ MAÇ UZAR ise skorTabelasi(periyotSkoru,takimSkoru,4)
 ] */
 // NOTE: Bununla ilgili bir test yoktur. Eğer logladığınız sonuçlar yukarıdakine benziyor ise tmamlandı sayabilirsiniz.
 
-function skorTabelasi(/*Kodunuzu buraya yazınız*/) {
-  /*Kodunuzu buraya yazınız*/
+function skorTabelasi(cbfPeriyotSkoru,cbfTakimSkoru,period) {
+  let homeScore = 0;
+  let awayScore = 0;
+  const scorePeriod = [];
+  for(let i = 0; i < period; i++){
+    let homeScorePeriod = cbfPeriyotSkoru(cbfTakimSkoru).EvSahibi;
+    let awayScorePeriod = cbfPeriyotSkoru(cbfTakimSkoru).KonukTakim;
+    homeScore += homeScorePeriod;
+    awayScore += awayScorePeriod;
+    let scorePeriodSTR = `${i+1}. Periyot: Ev Sahibi ${homeScorePeriod} - Konuk Takım ${awayScorePeriod}`;
+    scorePeriod.push(scorePeriodSTR); 
+  }
+  let periodNum = 0;
+  while(homeScore === awayScore){
+    periodNum++;
+    let homeScorePeriod = cbfPeriyotSkoru(cbfTakimSkoru).EvSahibi;
+    let awayScorePeriod = cbfPeriyotSkoru(cbfTakimSkoru).KonukTakim;
+    homeScore += homeScorePeriod;
+    awayScore += awayScorePeriod;
+    let scorePeriodSTR = `${periodNum}. UZATMA Periyot: Ev Sahibi ${homeScorePeriod} - Konuk Takım ${awayScorePeriod}`;
+    scorePeriod.push(scorePeriodSTR); 
+  }
+  for(let period of scorePeriod){
+    console.log(period)
+  }
+  return `Maç Sonucu: Ev Sahibi ${homeScore} - Konuk Takım ${awayScore}`;
 }
-
 
 
 
